@@ -80,7 +80,7 @@ fun EnterTokenDialog(
 
                             Toast.makeText(
                                 context,
-                                "Copied locall token!",
+                                "Copied local token!",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
