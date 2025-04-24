@@ -1,76 +1,54 @@
 package com.example.pushnotification
 
+
+import android.Manifest
+import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.pushnotification.ui.theme.PushnotificationTheme
-import android.Manifest
-import android.util.Log
-import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.FirebaseMessaging
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
 
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: ChatViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestNotificationPermission() // Now works fine!
 
-        FirebaseApp.initializeApp(this)
-
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val token = task.result
-                    Log.d("FCM", "FCM Token: $token")
-                } else {
-                    Log.w("FCM", "Fetching FCM token failed", task.exception)
-                }
-            }
-
-        enableEdgeToEdge()
+        requestNotificationPermission()
         setContent {
-            Surface(
-                color = MaterialTheme.colorScheme.background,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val state = viewModel.state
-                if (state.isEnteringToken) {
-                    EnterTokenDialog(
-                        token = state.remoteToken,
-                        onTokenChange = viewModel::onRemoteTokenChange,
-                        onSubmit = viewModel::onSubmitRemoteToken
-                    )
-                } else {
-                    ChatScreen(
-                        messageText = state.messagingText,
-                        onMessageSend = {
-                            viewModel.sendMessage(isBroadCast = false)
-                        },
-                        onMessageBroadcast = {
-                            viewModel.sendMessage(isBroadCast = true)
-                        },
-                        onMessageChange = viewModel::onMessageChange
-                    )
+            val navController = rememberNavController()
+            val context = LocalContext.current.applicationContext as Application
+            val viewModel: NotificationViewModel = viewModel(
+                factory = NotificationViewModelFactory(context)
+            )
+
+            NavHost(navController = navController, startDestination = Routes.HOME) {
+                composable(Routes.HOME) {
+                    HomeScreen(navController)
+                }
+                composable(Routes.NOTIFICATION_LOG) {
+                    NotificationLogScreen(viewModel)
                 }
             }
         }
+
+    }
+
+    object Routes {
+        const val HOME = "home"
+        const val NOTIFICATION_LOG = "notification_log"
     }
 
 
@@ -89,17 +67,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-}
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PushnotificationTheme {
-
     }
 }

@@ -32,7 +32,7 @@ import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun EnterTokenDialog(
     token: String,
@@ -92,7 +92,7 @@ fun EnterTokenDialog(
                 Button(
                     onClick = onSubmit
                 ) {
-                    Text("Submit")
+                    Text("Notifications")
                 }
             }
         }
