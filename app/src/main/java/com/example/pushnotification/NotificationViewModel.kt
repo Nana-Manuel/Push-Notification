@@ -2,26 +2,23 @@ package com.example.pushnotification
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.pushnotification.Data.AppDatabase
-import com.example.pushnotification.Data.NotificationEntity
-import com.example.pushnotification.Data.NotificationRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.example.pushnotification.NotificationEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 class NotificationViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = AppDatabase.getInstance(application).notificationDao()
     private val repository = NotificationRepository(dao)
 
-    private val _notifications = MutableStateFlow<List<NotificationEntity>>(emptyList())
-    val notifications: StateFlow<List<NotificationEntity>> = _notifications
+    val notifications = repository.notifications
 
-    init {
-        viewModelScope.launch {
-            _notifications.value = repository.getAllNotifications()
+    fun deleteNotification(notification: NotificationEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteNotification(notification)
         }
     }
+
 }
 

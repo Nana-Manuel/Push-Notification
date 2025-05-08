@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.generativeai)
     implementation(libs.firebase.vertexai)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
